@@ -29,10 +29,10 @@ let enable_events handle id event_type =
     ~f:(fun e -> "error encountered while enabling " ^ event_type ^ ": " ^ e)
 
 let read_response ?(timeout_ms = -1) buf handle =
-  match read ~timeout:timeout_ms handle buf Report.size with
-  | Error e -> Error e
-  | Ok 0 -> Error "Timeout"
-  | Ok n -> Ok (Report.to_string buf ~len:n)
+  read ~timeout:timeout_ms handle buf Report.size
+  |> Result.bind ~f:(function
+    | 0 -> Error "Timeout"
+    | n -> Ok (Report.to_string buf ~len:n))
 
 let handshake handle buf =
   let acc = Buffer.create Report.size in

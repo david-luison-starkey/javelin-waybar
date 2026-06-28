@@ -55,19 +55,19 @@ let decode_value v =
 let parse_fields packet =
   String.split_lines packet
   |> List.filter_map ~f:(fun line ->
-      match String.lsplit2 line ~on:':' with
-      | None -> None
-      | Some (k, v) -> Some (String.strip k, String.strip v))
+      String.lsplit2 line ~on:':'
+      |> Option.map ~f:(fun (k, v) -> (String.strip k, String.strip v)))
 
 let parse_event e =
   let fields = parse_fields e in
   let find k = List.Assoc.find fields k ~equal:String.equal in
-  let* event_type =
-    Result.of_option (find "e") ~error:("e key not present in message " ^ e)
+  let require k =
+    Result.of_option (find k) ~error:(k ^ " key not present in message " ^ e)
   in
+  let* event_type = require "e" in
   match event_type with
   | "p" ->
-      let* o = Result.of_option (find "o") ~error:"paper_tape missing o key" in
+      let* o = require "o" in
       let t = find "t" in
       let d = find "d" in
       let u = find "u" in
@@ -81,10 +81,10 @@ let parse_event e =
              undo = Option.bind u ~f:Int.of_string_opt;
            })
   | "s" ->
-      let* o = Result.of_option (find "o") ~error:"suggestion missing o key" in
+      let* o = require "o" in
       let d = find "d" in
-      let* t = Result.of_option (find "t") ~error:"suggestion missing t key" in
-      let* c = Result.of_option (find "c") ~error:"suggestion missing c key" in
+      let* t = require "t" in
+      let* c = require "c" in
       (* We never expect c to not be an int-shaped string, and always present for Suggestion event *)
       let* count =
         Result.of_option (Int.of_string_opt c)

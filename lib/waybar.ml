@@ -20,7 +20,7 @@ let escape_whitespace s =
 
 let to_payload history =
   let escaped =
-    List.map history ~f:escape_whitespace |> List.map ~f:pango_escape
+    List.map history ~f:(fun s -> pango_escape (escape_whitespace s))
   in
   let text = match escaped with [] -> "" | hd :: _ -> hd in
   let tooltip = String.concat ~sep:"\n" escaped in
