@@ -1,0 +1,5 @@
+(executable
+ (name main)
+ (public_name main)
+ (package javelin-waybar)
+ (libraries base bigstringaf stdio hidapi javelin_waybar unix))

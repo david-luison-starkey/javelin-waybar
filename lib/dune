@@ -1,0 +1,8 @@
+(library
+ (name javelin_waybar)
+ (public_name javelin-waybar)
+ (modules javelin_waybar hid event report waybar history)
+ (synopsis "Jarne/Javelin stenography paper tape for Waybar")
+ (preprocess
+  (pps ppx_jane))
+ (libraries yojson base bigstringaf))
